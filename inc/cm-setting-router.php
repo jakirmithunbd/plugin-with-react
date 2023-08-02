@@ -26,14 +26,15 @@ class CM_Settings_Router
     }
 
     public function get_settings() {
-        $first = sanitize_text_field(get_option('firstname'));
-        $last = sanitize_text_field(get_option('lastname'));
-        $email = sanitize_text_field(get_option('email'));
-        $phone = sanitize_text_field(get_option('phone'));
-        $enable = get_option('enable_cookie');
+        $cm_cookie = get_option('cm_cookie');
+        $first = $cm_cookie['first'];
+        $last = $cm_cookie['last'];
+        $email = $cm_cookie['email'];
+        $phone = $cm_cookie['phone'];
+        $enable = $cm_cookie['enable_cookie'];
         $response = [
-            'firstname' => $first,
-            'lastname'  => $last,
+            'first' => $first,
+            'last'  => $last,
             'email'     =>  $email,
             'phone'     =>  $phone,
             'enable_cookie' => $enable
@@ -47,17 +48,17 @@ class CM_Settings_Router
     }
 
     public function save_settings($req) {
-        $first = sanitize_text_field($req['firstname']);
-        $last = sanitize_text_field($req['lastname']);
-        $email = sanitize_text_field($req['email']);
-        $phone = sanitize_text_field($req['phone']);
-        $enable_co = $req['enable_cookie'];
+        
 
-        update_option('firstname', $first);
-        update_option('lastname', $last);
-        update_option('email', $email);
-        update_option('phone', $phone);
-        update_option('enable_cookie', $enable_co);
+        $cm_cookie = array(
+            'first' => sanitize_text_field($req['firstname']),
+            'last' => sanitize_text_field($req['lastname']),
+            'email' => sanitize_text_field($req['email']),
+            'phone' =>sanitize_text_field($req['phone']),
+            'enable_cookie' => $req['enable_cookie']
+        );
+
+        update_option('cm_cookie', $cm_cookie);
 
         return rest_ensure_response($req);
     }

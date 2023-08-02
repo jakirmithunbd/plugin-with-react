@@ -11,50 +11,53 @@ function Settings() {
         phone: '',
     })
 
-  const [enable_cookie, setenable_cookie] = useState()
-  const [loader, setLoader] = useState('Save Settings')
+    const [enable_cookie, setenable_cookie] = useState('disbled')
+    const [loader, setLoader] = useState('Save Settings')
 
-  const apiUrl = `${appLocalizer.apiUrl}/cmcookie/v1/settings`;
+    const apiUrl = `${appLocalizer.apiUrl}/cmcookie/v1/settings`;
 
-  const handleCheckbox = (e) => {
-    setenable_cookie((prevState) => !prevState)
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('e', e)
-    setLoader('Saving...');
-    axios.post(apiUrl, {
-        firstname: input.firstname,
-        lastname: input.lastname,
-        email: input.email,
-        phone: input.phone,
-        enable_cookie: enable_cookie
-    }, {
-        headers: {
-            'content-type': 'application/json',
-            'X-WP-NONCE': appLocalizer.cm_nonce
+    const handleCheckbox = (e) => {
+        if (e.target.checked) {
+            setenable_cookie('enabled')
+        } else {
+            setenable_cookie('disabled')
         }
-    })
-    
-    .then(res => {
-        console.log('res', res.config.data)
-        setLoader('Save Settings');
-    })
-  }
+    }
 
-  useEffect(() => {
-    axios.get(apiUrl).then(res => {
-        console.log(res)
-        setinput({
-            firstname: res.data.firstname,
-            lastname: res.data.lastname,
-            email: res.data.email,
-            phone: res.data.phone,
-            enable_cookie: res.data.enable_cookie
+    const handleSubmit = (e) => {
+            e.preventDefault();
+            setLoader('Saving...');
+            axios.post(apiUrl, {
+                firstname: input.firstname,
+                lastname: input.lastname,
+                email: input.email,
+                phone: input.phone,
+                enable_cookie: enable_cookie
+        }, {
+            headers: {
+                'content-type': 'application/json',
+                'X-WP-NONCE': appLocalizer.cm_nonce
+            }
         })
-    })
-  }, [])
+        
+        .then(res => {
+            setLoader('Save Settings');
+        })
+    }
+
+    useEffect(() => {
+        axios.get(apiUrl).then(res => {
+            console.log(res)
+            setinput({
+                firstname: res.data.first,
+                lastname: res.data.last,
+                email: res.data.email,
+                phone: res.data.phone
+            })
+
+            setenable_cookie(res.data.enable_cookie)
+        })
+    }, [])
   
 
   return (
@@ -66,7 +69,8 @@ function Settings() {
                 <div className='settings-fields'>
                     <div className="settings-checkbox-field">
                         <p>Enable Frontend Cookie </p>
-                        <input id='cookie_switcher' className="cm-checkbox" name="enable_cookie" checked={enable_cookie} onChange={ handleCheckbox } type="checkbox" />
+                        {console.log('first', enable_cookie == 'enabled' ? 'checked' : '')}
+                        <input id='cookie_switcher' className="cm-checkbox" name="enable_cookie" checked={enable_cookie === 'enabled' ? 'checked' : ''} value={ enable_cookie} onChange={ handleCheckbox } type="checkbox" />
                         <label htmlFor="cookie_switcher"></label>
                     </div>
                 </div>
